@@ -16,44 +16,8 @@ function addDomainSubs(Domain,Policy){
 function getSubscriptionPolicy(){
   return PubSubApp.policyBuilder()
   .newPolicy()
-  .addSubscriber("DOMAIN","ccsknights.org")
+  .addSubscriber("DOMAIN","__PROBABLY_ADD_YOUR_DOMAIN_HERE__")
 }
-
-
-function watchEmail(fullTopicName,watchOptions){
-  var options = {email:"me",token:ScriptApp.getOAuthToken(),labelIds:[]};
-  
-  for(var option in watchOptions){
-    if(option in options){
-      options[option] = watchOptions[option];
-    }
-  }
-   Logger.log(options);
-  var url = "https://www.googleapis.com/gmail/v1/users/"+options.email+"/watch"
-  
-  var payload = {
-    topicName: fullTopicName,
-    labelIds: options.labelIds
-  }
-  
-  var params = {
-    method:"POST",
-    contentType: "application/json",
-    payload: JSON.stringify(payload),
-    headers:{Authorization: "Bearer "+ options.token
-    },
-    muteHttpExceptions:true
-  }
-  
-   var results = UrlFetchApp.fetch(url, params);
-  
-  if(results.getResponseCode() != 200){
-     throw new Error(results.getContentText())
-  }else{
-    return JSON.parse(results.getContentText());
-  }
-  
- }
 
 function CreateTopic(topicName) {
   var topic;
@@ -84,6 +48,11 @@ function getTokenService(){
   return sa.tokenService(serviceAccountEmail);
 }
 
+function getLabelIdByName(name = "INBOX") {
+  const labels = Gmail.Users.Labels.list('me').labels;
+  const labelId = labels.find(l => l.name == name).id;
+  return labelId;
+}
 
 function requestGmailScope_(){GmailApp.getAliases()}
 
