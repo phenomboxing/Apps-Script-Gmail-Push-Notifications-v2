@@ -6,7 +6,7 @@ function doPost(e){
   var messageData = Utilities.newBlob(Utilities.base64Decode(postBody.message.data)).getDataAsString();
   var ss = SpreadsheetApp.openById('...').getSheetByName("Log");
   ss.appendRow([new Date(), messageData, JSON.stringify(postBody,undefined,2)])
-  return 200;
+  return HtmlService.createHtmlOutput('');
 }
 
 function setupPubSub(){
@@ -26,6 +26,5 @@ function enrollEmail(email){
   var email = email || "me";
   PubSubApp.setTokenService(getTokenService())
   var topicName = PubSubApp.PublishingApp(PROJECTID).getTopicName("mailTrigger")
-  Logger.log(watchEmail(topicName,{labelIds:["INBOX"], email:email}));
+  Logger.log(Gmail.Users.watch({labelFilterAction: 'include', labelIds: ["INBOX"].map(n => getLabelIdByName(n)),topicName}, email));
 }
-
